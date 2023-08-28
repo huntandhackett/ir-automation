@@ -13,6 +13,8 @@ plugin_fields = {
     # "windows/registry/firewall": ["Key", "Action", "Active", "Dir", "Protocol"],
     # "filesystem/windows/etl": ["Path", "ProviderName", "EventType"],
     # End hardcoded dynamic records
+    "filesystem/windows/amcache/install/arp_create": ["Path"],
+    "filesystem/windows/amcache/install/file_create": ["Path"],
     "application/log/webserver": [
         "Method",
         "URI",
@@ -23,6 +25,19 @@ plugin_fields = {
         "UserAgent",
         "Referer",
     ],
+    "browser/chrome/extension": ["Browser", "Name"],
+    "browser/chrome/download": ["Browser", "Path", "URL"],
+    "browser/chrome/history": ["Browser", "Title", "URL"],
+    "browser/chromium/download": ["Browser", "Path", "URL"],
+    "browser/chromium/extension": ["Browser", "Name"],
+    "browser/chromium/history": ["Browser", "Title", "URL"],
+    "browser/edge/download": ["Browser", "Path", "URL"],
+    "browser/edge/extension": ["Browser", "Name"],
+    "browser/edge/history": ["Browser", "Title", "URL"],
+    "browser/firefox/download": ["Browser", "Path", "URL"],
+    "browser/firefox/history": ["Browser", "Title", "URL"],
+    "browser/ie/download": ["Browser", "Path", "URL"],
+    "browser/ie/history": ["Browser", "Title", "URL"],
     "filesystem/entry": ["Path"],
     "filesystem/acquire_hash": ["Path"],
     "filesystem/yara/match": ["Path", "Rule", "Tags"],
@@ -47,7 +62,14 @@ plugin_fields = {
     "browser/edge/history": ["Browser", "Title", "Url"],
     "browser/ie/history": ["Browser", "Title", "Url"],
     "browser/chrome/history": ["Browser", "Title", "Url"],
-    "linux/service": ["name", "servicePath", "serviceVariables"],
+    "generic/osinfo": ["Name", "Value"],
+    "linux/user": [
+        "Name",
+        "shell",
+        "UID",
+        "GID",
+    ],
+    "linux/service": ["name", "source"],
     "linux/environmentvariable": ["Key", "Value", "Source"],
     "linux/cronjob": ["command"],
     "linux/keyboard": ["layout", "model", "variant", "options", "backspace"],
@@ -58,41 +80,37 @@ plugin_fields = {
         "command",
         "requested_by_user",
     ],
-    "unix/ssh/authorized_keys": [
-        "user",
-        "keytype",
+    "linux/log/journal": ["Message", "Cmdline"],
+    "application/openssh/authorized_keys": [
+        "Key_Type",
         "public_Key",
         "Comment",
         "Options",
         "Path",
     ],
-    "unix/ssh/known_host": [
-        "User",
+    "application/openssh/known_host": [
         "Hostname_Pattern",
-        "Keytype",
+        "Key_Type",
         "Public_Key",
         "Comment",
         "Marker",
         "Path",
     ],
-    "unix/ssh/private_key": [
-        "User",
+    "application/openssh/private_key": [
         "Key_Format",
         "Key_Type",
         "Public_Key",
         "Comment",
         "Encrypted",
-        "Source",
     ],
-    "unix/ssh/public_key": [
-        "User",
+    "application/openssh/public_key": [
         "Key_Type",
         "Public_Key",
         "Comment",
-        "Source",
     ],
     "linux/shadow": ["Name"],
     "linux/history": ["Command", "Source"],
+    "linux/iptables/save": ["Type", "Table", "Chain", "Program", "rule"],
     "linux/debian/dpkg/package/log": [
         "Name",
         "Operation",
@@ -133,9 +151,11 @@ plugin_fields = {
         "CMDline",
     ],
     "linux/log/lastlog": ["UID", "UT_User", "UT_Host", "UT_Tty"],
+    "windows/user": ["name", "home", "SID"],
     "windows/filesystem/recyclebin": ["Path", "Deleted_Path"],
     "windows/service": ["Name", "DisplayName", "ImagePath", "Start", "Type"],
     "uri_datetime": ["Example"],
+    "path_datetime": ["Path"],
     "windows/pathext": ["Pathext"],
     "windows/environment": ["Name", "Value"],
     "filesystem/acquire_open_handles": ["Name", "Handle_Type", "Object"],
@@ -162,12 +182,15 @@ plugin_fields = {
         "Detection_Type",
         "Detection_Name",
     ],
+    "filesystem/windows/defender/quarantine": ["Detection_Type", "Detection_Name"],
+    "filesystem/windows/defender/exclusion": ["type", "value"],
     "filesystem/windows/defender/quarantine/file": ["Detection_Name", "Detection_Path"],
     "windows/catroot": ["Hint", "Source"],
     "windows/thumbcache/iconcache": ["Path"],
     "windows/thumbcache/thumbcache": ["Path"],
     "windows/thumbcache/index": ["Path"],
     "windows/syscache/object": ["Program_ID", "File_ID", "Path"],
+    "windows/registry/appxdebug/key": ["Name", "Debug_Info"],
     "filesystem/registry/bootshell": ["Path"],
     "filesystem/registry/appinit": ["Path"],
     "filesystem/registry/winrar": ["Path"],
@@ -311,14 +334,50 @@ plugin_fields = {
     "filesystem/windows/evt": ["EventID", "SourceName"],
     "filesystem/windows/pfro": ["Operation", "Path"],
     "application/log/remoteaccess": ["Tool", "Description"],
+    "application/av/mcafee/msc/log": [
+        "Threat",
+        "Message",
+        "Keywords",
+    ],
+    "application/av/mcafee/msc/firewall": [
+        "IPAddress",
+        "Port",
+        "Protocol",
+        "Message",
+        "Keywords",
+    ],
+    "application/av/trendmicro/wf/firewall": [
+        "Local_IP",
+        "Remote_IP",
+        "Direction",
+        "Port",
+        "Path",
+        "Description",
+    ],
+    "application/av/trendmicro/wf/log": ["Threat", "Path"],
+    "application/av/sophos/hitman/log": ["Alert", "Description", "Details"],
+    "application/av/sophos/home/log": ["Description", "Path"],
+    "application/log/cpanel/lastlogin": ["User", "Remote_IP"],
+    "application/vpn/openvpn/client": ["Name"],
+    "application/vpn/openvpn/server": ["Name"],
+    "powershell/history": ["Command", "Source"],
     "apps/containers/docker/container": ["Container_ID", "Image", "Command"],
     "apps/containers/docker/image": ["Name", "Tag"],
     "application/vpn/wireguard/interface": ["Name"],
     "application/vpn/wireguard/peer": ["Name"],
     "datetime": ["Example"],
+    "osx/account_policy": ["Username", "Failed_Login_Count"],
 }
 
 skip_record_names = ["uri_datetime", "uri", "datetime"]
+timesketch_fields = [
+    "message",
+    "data_type",
+    "timestamp",
+    "datetime",
+    "timestamp_desc",
+]
+# FIX usage of the message field
 # logstash_fields = ["data_type", "event", "log", "host"]
 
 for p in plugin.plugins():
@@ -351,7 +410,7 @@ for p in plugin.plugins():
                         print(f"Field {field} is empty in the record {r.name}")
                         print("--------------------------")
                         exit()
-                    message += f"{field.capitalize()}:%{{{field.lower()}}} "
+                    message += f"{field.capitalize()}: %{{{field.lower()}}} "
                 message = message[:-1]
                 print(f'    mutate {{ add_field => {{ "message" => "{message}" }} }}')
                 print("  }")
