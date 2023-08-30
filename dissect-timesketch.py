@@ -5,14 +5,6 @@ Creates a Logstash filter based on Dissect Target records. It does not support D
 """
 
 plugin_fields = {
-    # Hardcoded dynamic records
-    # "filesystem/windows/evtx": ["EventID", "Provider_Name"],
-    # "filesystem/windows/task": ["Uri", "Command"],
-    # "filesystem/windows/amcache/install": ["Filename", "Path"],
-    # "filesystem/windows/wer/report": ["App_Name", "Event_Type"],
-    # "windows/registry/firewall": ["Key", "Action", "Active", "Dir", "Protocol"],
-    # "filesystem/windows/etl": ["Path", "ProviderName", "EventType"],
-    # End hardcoded dynamic records
     "filesystem/windows/amcache/install/arp_create": ["Path"],
     "filesystem/windows/amcache/install/file_create": ["Path"],
     "application/log/webserver": [
@@ -151,7 +143,6 @@ plugin_fields = {
         "CMDline",
     ],
     "linux/log/lastlog": ["UID", "UT_User", "UT_Host", "UT_Tty"],
-    "windows/user": ["name", "home", "SID"],
     "windows/filesystem/recyclebin": ["Path", "Deleted_Path"],
     "windows/service": ["Name", "DisplayName", "ImagePath", "Start", "Type"],
     "uri_datetime": ["Example"],
@@ -202,6 +193,10 @@ plugin_fields = {
     "filesystem/registry/winsocknamespaceprovider": ["LibraryPath"],
     "filesystem/registry/alternateshell": ["Path"],
     "filesystem/registry/sessionmanager": ["Path"],
+    "windows/registry/nethist": ["Profile_Name", "Description"],
+    "windows/registry/run": ["Name", "Path", "Key"],
+    "windows/registry/bam": ["Path"],
+    "windows/registry/auditpol": ["Category", "Name", "Value"],
     "windows/activitiescache": ["App_ID"],
     "path_string_datetime": ["String"],
     "filesystem/windows/startupinfo": ["Path", "Commandline", "Parent_Name"],
@@ -281,7 +276,7 @@ plugin_fields = {
     "windows/registry/bam": ["Path"],
     "windows/registry/auditpol": ["Name", "Value", "Category"],
     "windows/recentfilecache": ["Path"],
-    "windows/registry/clsid": ["Name", "Value", "ClsID"],
+    "windows/registry/clsid": ["Name", "Value", "CLSID"],
     "windows/registry/cit/system/bitmap/input": [
         "Aggregation_Period_In_S",
         "Bit_Period_In_S",
