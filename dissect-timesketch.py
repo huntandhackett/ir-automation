@@ -46,8 +46,6 @@ plugin_fields = {
     "filesystem/ntfs/mft/filename/compact": ["Path"],
     "filesystem/ntfs/mft/filename": ["ts_type", "Path"],
     "filesystem/ntfs/mft/std/compact": ["Path"],
-    "example/registry/user": ["ts"],
-    "example/descriptor": ["field_a"],
     "browser/history": ["Browser", "Title", "Url"],
     "browser/firefox/history": ["Browser", "Title", "Url"],
     "browser/chromium/history": ["Browser", "Title", "Url"],
@@ -72,7 +70,7 @@ plugin_fields = {
         "command",
         "requested_by_user",
     ],
-    "linux/log/journal": ["Message", "Cmdline"],
+    "linux/log/journal": ["Message"],
     "application/openssh/authorized_keys": [
         "Key_Type",
         "public_Key",
@@ -145,8 +143,6 @@ plugin_fields = {
     "linux/log/lastlog": ["UID", "UT_User", "UT_Host", "UT_Tty"],
     "windows/filesystem/recyclebin": ["Path", "Deleted_Path"],
     "windows/service": ["Name", "DisplayName", "ImagePath", "Start", "Type"],
-    "uri_datetime": ["Example"],
-    "path_datetime": ["Path"],
     "windows/pathext": ["Pathext"],
     "windows/environment": ["Name", "Value"],
     "filesystem/acquire_open_handles": ["Name", "Handle_Type", "Object"],
@@ -198,7 +194,6 @@ plugin_fields = {
     "windows/registry/bam": ["Path"],
     "windows/registry/auditpol": ["Category", "Name", "Value"],
     "windows/activitiescache": ["App_ID"],
-    "path_string_datetime": ["String"],
     "filesystem/windows/startupinfo": ["Path", "Commandline", "Parent_Name"],
     "windows/keyboard": ["Layout", "ID"],
     "windows/filesystem/lnk": ["LNK_Name", "LNK_IconLocation", "LNK_Path"],
@@ -272,7 +267,6 @@ plugin_fields = {
         "DNS_Suffix",
         "First_Network",
     ],
-    "uri": ["Example"],
     "windows/registry/bam": ["Path"],
     "windows/registry/auditpol": ["Name", "Value", "Category"],
     "windows/recentfilecache": ["Path"],
@@ -334,6 +328,24 @@ plugin_fields = {
         "Message",
         "Keywords",
     ],
+    "application/av/symantec/sep/log": [
+        "virus",
+        "user",
+        "source_file",
+        "action_taken",
+        "virus_type",
+    ],
+    "application/av/symantec/sep/firewall": [
+        "rule_name",
+        "application",
+        "protocol",
+        "local_ip",
+        "local_ip6",
+        "local_port",
+        "remote_ip",
+        "remote_ip6",
+        "remote_port",
+    ],
     "application/av/mcafee/msc/firewall": [
         "IPAddress",
         "Port",
@@ -360,20 +372,18 @@ plugin_fields = {
     "apps/containers/docker/image": ["Name", "Tag"],
     "application/vpn/wireguard/interface": ["Name"],
     "application/vpn/wireguard/peer": ["Name"],
-    "datetime": ["Example"],
     "osx/account_policy": ["Username", "Failed_Login_Count"],
 }
 
-skip_record_names = ["uri_datetime", "uri", "datetime"]
-timesketch_fields = [
-    "message",
-    "data_type",
-    "timestamp",
+skip_record_names = [
+    "uri_datetime",
+    "uri",
     "datetime",
-    "timestamp_desc",
+    "path_datetime",
+    "path_string_datetime",
+    "example/registry/user",
+    "example/descriptor",
 ]
-# FIX usage of the message field
-# logstash_fields = ["data_type", "event", "log", "host"]
 
 for p in plugin.plugins():
     if len(p["exports"]):
@@ -381,6 +391,8 @@ for p in plugin.plugins():
         all_records = loaded_plugin.get_all_records.__record__
         if all_records:
             for r in all_records:
+                if r.name in skip_record_names:
+                    continue
                 if not plugin_fields.get(r.name):
                     print("--------------------------")
                     print(f"Record {r.name} is empty")
@@ -389,12 +401,11 @@ for p in plugin.plugins():
                 if not plugin_fields.get(r.name) and not r.name in skip_record_names:
                     print(f"The record {r.name} is new")
                     exit()
-                if r.name in skip_record_names:
-                    continue
                 print(f'  else if [data_type] == "{r.name}" {{')
                 message = ""
                 for field in plugin_fields.get(r.name):
-                    if not field.lower() in list(map(str.lower, r.fields)):
+                    field = field.lower()
+                    if not field in list(map(str.lower, r.fields)):
                         print("--------------------------")
                         print(r.fields)
                         print(f"Field {field} is not part of the the record {r.name}")
@@ -405,7 +416,10 @@ for p in plugin.plugins():
                         print(f"Field {field} is empty in the record {r.name}")
                         print("--------------------------")
                         exit()
-                    message += f"{field.capitalize()}: %{{{field.lower()}}} "
+                    if field == "message":
+                        message += f"%{{msg}} "
+                    else:
+                        message += f"{field.capitalize()}: %{{{field}}} "
                 message = message[:-1]
                 print(f'    mutate {{ add_field => {{ "message" => "{message}" }} }}')
                 print("  }")
