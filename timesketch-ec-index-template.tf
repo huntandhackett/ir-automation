@@ -7,32 +7,16 @@ locals {
         type = "date"
       }
       timestamp_desc = {
-        type = "text"
-        fields = {
-          keyword = {
-            type = "keyword"
-          }
-        }
+        type = "keyword"
       }
       data_type = {
-        type = "text"
-        fields = {
-          keyword = {
-            type = "keyword"
-          }
-        }
+        type = "keyword"
       }
       timesketch_label = {
         type = "nested"
         properties = {
           name = {
-            type = "text"
-            fields = {
-              keyword = {
-                type         = "keyword"
-                ignore_above = 256
-              }
-            }
+            type = "keyword"
           }
           sketch_id = {
             type = "long"
@@ -45,9 +29,8 @@ locals {
       __ts_timeline_id = {
         type = "long"
       }
-    }
 
-    # The other fields are mapped to an object or text.
+    # The other fields are mapped to as object or wildcard.
     dynamic_templates = [
       {
         object = {
@@ -58,16 +41,10 @@ locals {
         }
       },
       {
-        string = {
+        wildcard = {
           match_mapping_type = "*"
           mapping = {
-            type = "text"
-            fields = {
-              keyword = {
-                type         = "keyword"
-                ignore_above = 256
-              }
-            }
+            type = "wildcard"
           }
         }
       }
