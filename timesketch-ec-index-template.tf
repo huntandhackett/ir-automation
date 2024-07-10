@@ -16,7 +16,12 @@ locals {
         type = "nested"
         properties = {
           name = {
-            type = "keyword"
+            type = "text"
+            fields = {
+              keyword = {
+                type = "keyword"
+              }
+            }
           }
           sketch_id = {
             type = "long"
@@ -25,6 +30,9 @@ locals {
             type = "long"
           }
         }
+      }
+      tag = {
+        type = "keyword"
       }
       __ts_timeline_id = {
         type = "long"
