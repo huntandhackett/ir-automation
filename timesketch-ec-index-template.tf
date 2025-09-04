@@ -1,5 +1,11 @@
-resource "elasticstack_elasticsearch_component_template" "timesketch-timelines" {
-  name = "timesketch-timelines"
+resource "elasticstack_elasticsearch_index_template" "timesketch-timelines" {
+  name           = "timesketch-timelines"
+  index_patterns = ["timesketch-timelines*"]
+  priority       = 500
+
+
+  # Optional if data stream is used
+  #data_stream {}
 
   template {
     mappings = jsonencode({
@@ -71,9 +77,9 @@ resource "elasticstack_elasticsearch_component_template" "timesketch-timelines" 
     })
   }
 
-  elasticsearch_connection {
-    endpoints = [<ENDPOINT>]
-    username  = <USERNAME>
-    password  = <PASSWORD>
+ elasticsearch_connection {
+   endpoints = [<ENDPOINT>]
+   username  = <USERNAME>
+   password  = <PASSWORD>
   }
 }
