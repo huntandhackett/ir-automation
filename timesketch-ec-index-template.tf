@@ -37,6 +37,7 @@ locals {
       __ts_timeline_id = {
         type = "long"
       }
+    }
 
     # The other fields are mapped to as object or wildcard.
     dynamic_templates = [
